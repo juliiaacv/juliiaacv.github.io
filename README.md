@@ -7,7 +7,7 @@ Este repositorio contiene el blog desarrollado para la asignatura **Visión Rob�
 ## 🚀 Cómo acceder al blog
 El blog está disponible en la siguiente dirección:
 
-➡️ **[https://tu-usuario.github.io](https://tu-usuario.github.io)** (Reemplaza *tu-usuario* con el nombre de usuario correcto de GitHub).
+➡️ **[https://juliiaacv.github.io](https://juliiaacv.github.io)**
 
 ---
 
