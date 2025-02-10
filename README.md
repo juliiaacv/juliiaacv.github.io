@@ -1,4 +1,3 @@
-# juliiaacv.github.io
 # Blog de Visión Robótica
 
 ## 📌 Descripción
