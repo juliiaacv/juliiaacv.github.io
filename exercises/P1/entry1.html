@@ -3,15 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>P1 - Follow Line</title>
+    <title>P1 - Follow Line | Entry 1</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        a { color: #007bff; text-decoration: none; }
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        img {
+            width: 100%;
+            max-width: 600px;
+            display: block;
+            margin: 10px auto;
+            border-radius: 10px;
+        }
+        .back {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #007bff;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .back:hover {
+            color: #0056b3;
+        }
     </style>
 </head>
 <body>
-    <h1>P1 - Follow Line</h1>
-    <p>Blablabla</p>
-    <p><a href="../../index.html">⬅ Back to Home</a></p>
+    <div class="container">
+        <h1>Entry 1: System Initialization & Line Detection</h1>
+
+        <h2>🚀 Initialization</h2>
+        <p>
+            First, it is important to start with a simple and basic test to observe how the system works and 
+            to get familiar with the environment and the conditions in which we will be working. 
+            For this reason, I started the car in the <strong>Simple Circuit</strong> at a very low and constant 
+            linear speed, with no rotational speed.
+        </p>
+        <p>The first observation is the image captured by the camera:</p>
+
+        <img src="exercises\P1\images\img1.png" alt="Image captured by the car's camera in a straight line">
+        <img src="exercises\P1\images\img2.png" alt="Image captured by the car's camera in a curve">
+        <p>
+            Since the rotational speed is 0 and constant, the car moves in a straight line and exits 
+            the track at the first curve.
+        </p>
+
+        <h2>🎯 Line Detection</h2>
+        <p>
+            The first step to guiding the car along the line is to detect the reference line.
+            To achieve this, I printed the <strong>RGB value</strong> of the central pixel from the first 
+            iteration of the loop, which corresponds to a pixel in the line. The result obtained is 
+            <strong>[41, 41, 207]</strong>.
+        </p>
+
+        <img src="exercises\P1\images\img3.png" alt="Pixel (on green) from which the RGB value of the line to be followed is extracted">
+
+        <p>
+            With this value, I proceeded to calculate the <strong>mask</strong> that will be used later 
+            as a reference for the control system.
+            Although the value was obtained in <strong>RGB</strong>, it is preferable to use the 
+            <strong>HSV</strong> color space because it separates color information from illumination, 
+            allowing for a more stable detection under different lighting conditions.
+
+            To account for possible variations in the line’s tone, I defined a small range of ±10, 
+            which is then used to filter the pixels in the captured image to obtain the final mask.
+        </p>
+        </p>
+
+        <img src="exercises\P1\images\img4.png" alt="Mask created for the line detection in a straight line">
+
+        <p>
+        </p>
+
+        <img src="exercises\P1\images\img4.png" alt="Mask created for the line detection in a curve">
+
+        <p>
+        <p class="back"><a href="index.html">⬅ Back to P1 - Follow Line</a></p>
+    </div>
 </body>
 </html>
