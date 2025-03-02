@@ -84,7 +84,8 @@
             Although the value was obtained in <strong>RGB</strong>, it is preferable to use the 
             <strong>HSV</strong> color space because it separates color information from illumination, 
             allowing for a more stable detection under different lighting conditions.
-
+        </p>
+        <p>
             To account for possible variations in the line’s tone, I defined a small range of ±10, 
             which is then used to filter the pixels in the captured image to obtain the final mask.
         </p>
@@ -96,4 +97,10 @@
         <p class="back"><a href="index.html">⬅ Back to P1 - Follow Line</a></p>
     </div>
 </body>
+
+
+ 
+ 
+Como resultado he podido observar que las oscilaciones han disminuido notablemente (con los mismos parámetros que en la prueba anterior) aunque el coche se sigue desviando mucho en las curvas, alejándose bastante de la línea de referencia. El coche ha completado el circuito en 333 segundos (Con velocidad máxima a 4.0 y ambos KP a 0.005).
+
 </html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P1 - Follow Line | Entry 2</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        img {
+            width: 100%;
+            max-width: 600px;
+            display: block;
+            margin: 10px auto;
+            border-radius: 10px;
+        }
+        .back {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #007bff;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .back:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Entry 2: P Controller, Centroid Calculation & D Controller</h1>
+
+        <h2 style="text-align: center;"> ⚙️ P Controller</h2>
+        <p>
+            To control both the turning and linear speeds based on the reference line, I started by applying a proportional controller (P) to these variables. 
+            The error is obtained from the distance between the center of the image and the centroid of the detected line using the mask.
+        </p>
+
+        <p>
+            Initially, I applied control only to the turning speed, but extending it to the linear speed allows the car to slow down when taking curves.
+            This makes it easier to achieve proper turning without veering off the reference line. To accomplish this, I defined two different proportional 
+            coefficients <strong>KP</strong>, one for turning control and another for speed reduction.
+        </p>
+
+        <p>
+            At this stage, with a maximum linear speed of <strong>4.0</strong> and a minimum of <strong>2.0</strong>, and both proportional constants 
+            set to <strong>0.005</strong>, the car completes the circuit in <strong>400 seconds</strong>.
+            However, I noticed significant oscillations in the curves. When printing the error, it fluctuates drastically, 
+            which could be related to the calculated centroid position, causing abrupt changes in the turning speed.
+        </p>
+
+        <p>
+            <img src="images\img8.png" alt="Change of the error prints">
+        </p>
+
+        <h2 style="text-align: center;">📍 Calculation of the centroid</h2>
+        <p>
+            To avoid such abrupt changes of the error, I proceed to calculate a centroid less close to the 
+            car and therefore allowing to predict the action of the car earlier. Currently the centroid is 
+            calculated with respect to the full image, resulting in a point too far down:
+        </p>
+        <p>
+            <img src="images\img6.png" alt="(In blue) centroid calculated on the total of the image.">
+        </p>
+
+        <p>
+            To calculate a higher centroid (corresponding to a point further away from the camera) 
+            I will select a region of interest in the central strip of the image, on which the new centroid 
+            will be calculated. In this way it is possible to anticipate in advance the action to be performed.
+            I tested several ROI sizes until I found a centroid that I considered optimal through several runs. 
+        </p>
+        <p>
+            <img src="images\img7.png" alt="(In blue) centroid calculated over the region of interest.">
+        </p>
+
+        <p>
+            As a result, I observed that the oscillations have significantly decreased (with the same parameters as in the previous test). 
+            However, the car still deviates considerably in curves, moving too far away from the reference line. 
+            The car completed the circuit in <strong>333 seconds</strong> (with a maximum speed of 4.0 and both KP values at 0.005).
+        </p>
+
+        <h2 style="text-align: center;"> 🛠️ D Controller</h2>
+        <p>
+            The next step was to implement a <strong>derivative (D) controller</strong>, for now, only applied to the angular velocity.
+            As an initial test, I assigned a derivative constant of <strong>0.003</strong> to observe the behavior. 
+            The maximum linear speed remains at 4.0 for now.
+        </p>
+
+        <p>
+            The first noticeable improvement is that the oscillation observed in the previous execution is significantly reduced. 
+            In particular, I noticed that upon reaching a straight section, the car oscillates very briefly but does not cross the line in the opposite direction. 
+            Instead, it stabilizes quite quickly. However, it is important to note that the linear speed is still relatively low.
+        </p>
+
+        <h3>📹 VIDEO 1</h3>
+        <iframe width="560" height="315" 
+            src="https://youtu.be/B30QmK75ipg" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+
+        <h2>🚨 In case the line is not visible</h2>
+        <p>
+            Next, I tested increasing the maximum speed significantly (<strong>10.0</strong>) to see what happens. 
+            In the first curve, the car went off track because the turning was not fast enough compared to the linear speed at that moment. 
+        </p>
+
+        <p>
+            When it lost sight of the line, the system was set up to slow down and turn until the line was detected again. 
+            However, in this case, the car turned in the <strong>opposite direction</strong> and continued its route in reverse. 
+            This showed me that it is necessary to force the car to turn in the same direction it was moving before losing the line.
+        </p>
+
+        <p>
+            To achieve this, I simply increased the angular velocity in the <strong>same direction</strong> 
+            (i.e., keeping the same sign) as the last registered velocity. 
+            This way, the car keeps turning until it detects the line again, ensuring that it maintains the correct circuit direction. 
+            Meanwhile, the linear speed remains at the minimum configured value.
+        </p>
+
+        <img src="images/car_lost_line.jpg" alt="Car losing track and turning incorrectly">
+
+        <p>
+            With a speed of <strong>10.0</strong> and the same <strong>P and D parameters</strong>, the simple car completes the circuit in <strong>188 seconds</strong>. 
+            However, it keeps "bouncing" against the road boundaries because it tends to deviate too much in the curves. 
+            For now, I will reduce the speed and start fine-tuning the parameters.
+        </p>
+
+        <p class="back"><a href="index.html">⬅ Back to P1 - Follow Line</a></p>
+    </div>
+</body>
+</html>
