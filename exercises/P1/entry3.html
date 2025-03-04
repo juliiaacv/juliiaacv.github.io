@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P1 - Follow Line | Entry 3</title>
+    <style>
+        body {
+            font-family: 'Verdana', sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #d2baee;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #450549;
+            text-align: center;
+        }
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        img {
+            width: 100%;
+            max-width: 600px;
+            display: block;
+            margin: 10px auto;
+            border-radius: 10px;
+        }
+        .back {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #b82c89;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .back:hover {
+            color: #b82c89;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Entry 3: Parameter Tuning, Dynamic PD Parameters & Integral Controller</h1>
+
+        <h2>🎯 First Parameter Tuning</h2>
+        <p>
+            With the <strong>PD controllers</strong> on angular speed and the <strong>P controller</strong> on linear speed, I proceeded 
+            to perform the first parameter tuning to increase the maximum linear speed and reduce the lap time.
+        </p>
+
+        <p>
+            I progressively assigned values and experimented with the parameters to observe their effects:
+        </p>
+
+        <ul>
+            <li><strong>Increasing KP for angular speed:</strong> The vehicle corrects its direction more aggressively, reacting faster to 
+                changes in the line trajectory. However, if KP is too high, the car may start oscillating from side to side instead of 
+                following a smooth path.</li>
+            <li><strong>Increasing KD for angular speed:</strong> It smooths out turns, reducing excessive oscillations caused by a high KP. 
+                However, if KD is too high, the system may respond with a delay, preventing the vehicle from correcting its trajectory 
+                quickly enough in sharp turns.</li>
+            <li><strong>Increasing KP for linear speed:</strong> The car adjusts its speed more quickly based on the error, slowing down in 
+                sharp curves and accelerating on straight sections. However, if KP is too high, the speed may vary abruptly, leading to an 
+                unstable driving behavior.</li>
+        </ul>
+
+        <p>
+            These adjustments demonstrate how balancing KP and KD for angular speed, along with proper KP tuning for linear speed, is key 
+            to achieving efficient, stable line tracking without excessive oscillations.
+        </p>
+
+        <h2>⚙️ D Control for Linear Speed & I Controller</h2>
+        <p>
+            Despite tuning the parameters and achieving substantial improvement in the simulation car 
+            (completing the lap in <strong>90 seconds</strong> on the Simple Circuit), when switching to the Ackermann car, 
+            the oscillations reappeared, and the <strong>P controller</strong> for linear speed seemed insufficient.
+        </p>
+
+        <p>
+            Therefore, the next step was to integrate a <strong>derivative (D) controller</strong> into linear speed control. 
+            This allows anticipation of abrupt error changes, smoothing the transition between acceleration and braking, and avoiding excessive speed fluctuations.
+        </p>
+
+        <p>
+            Additionally, I decided to implement the <strong>integral (I) controller</strong>, which takes into account the accumulated error over time. 
+            This is not the case in the Simple Circuit, but other circuits contain longer and smoother curves that could significantly benefit from this type of controller.
+        </p>
+
+        <p>
+            Proper parameter tuning for all three controllers is necessary to observe real results and analyze their effects.
+        </p>
+
+        <h2>📏 Error Normalization</h2>
+        <p>
+            In the current code, the error has no maximum limit, meaning it can sometimes reach very high values, such as 300 or more. 
+            This results in excessively large output values from the P, I, and D terms, exceeding the optimal speed and steering values, 
+            leading to a zigzagging effect.
+        </p>
+
+        <p>
+            To solve this, I decided to scale the error to a fixed range (<strong>-100 to 100</strong>) using the image dimensions. 
+            This way, the correction remains proportional and stable regardless of image size, preventing excessive error growth.
+        </p>
+
+        <h2>🔧 Dynamic PD Parameters</h2>
+        <p>
+            When tuning parameters for the <strong>Ackermann car</strong>, I quickly noticed that the settings that work well for curves 
+            do not perform as effectively on straight sections, where oscillations become more evident.
+        </p>
+
+        <p>
+            I considered dynamically adjusting the <strong>P and D constants</strong> for angular speed control depending on whether 
+            the car was on a straight path or a curve.
+        </p>
+
+        <p>
+            I tested two different approaches for detecting curves:
+        </p>
+
+        <ul>
+            <li><strong>Error threshold:</strong> Assuming that when the car is in a curve, the error increases significantly, while on straight sections, 
+                the deviation remains lower.</li>
+            <li><strong>Change rate of error over iterations:</strong> Measuring how abruptly the error increases between consecutive iterations, 
+                since this change is more pronounced in curves and smoother on straight sections.</li>
+        </ul>
+
+        <p>
+            The best performance was achieved using the first method, so I ultimately chose it.
+        </p>
+
+        <p><strong>UPDATE:</strong> Later, I noticed that when the car approached the line in curves, the parameter changes caused more oscillations. 
+            I tried other techniques to detect curves and straights (such as using the contours of the calculated mask), 
+            but none were robust enough to provide substantial improvements. 
+            Therefore, I ultimately <strong>disabled this feature in the final code.</strong>
+        </p>
+
+        <h2>📉 Integral Controller</h2>
+        <p>
+            After extensive testing with various controller parameters, I realized that the first version of my integral controller had significant issues. 
+            It lacked a limitation on the accumulated error, which led to excessive error buildup. 
+            To fix this, I set a <strong>limit of 100</strong> for the accumulated error.
+        </p>
+
+        <p>
+            I experimented with different values, but this limit proved to be the most stable, preventing large error accumulations from causing drastic steering changes.
+        </p>
+
+        <p>
+            Additionally, I implemented logic to reset the error history when the error approaches zero. 
+            This ensures that once a correction has been made, the integral controller does not continue influencing the steering unnecessarily.
+        </p>
+
+        <p>
+            Another key observation was that the integral controller was <strong>not very useful</strong> for this task, 
+            especially for controlling linear speed. Initially, I disabled it for linear speed control, 
+            leaving it only for angular speed control.
+        </p>
+
+        <p class="back"><a href="index.html">⬅ Back to P1 - Follow Line</a></p>
+    </div>
+</body>
+</html>
