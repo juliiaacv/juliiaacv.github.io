@@ -28,6 +28,18 @@
             line-height: 1.6;
             text-align: justify;
         }
+        .video-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        iframe {
+            width: 100%;
+            max-width: 800px; /* Increase width if needed */
+            height: 450px; /* Increase height for better visibility */
+            border-radius: 10px;
+        }
+
         img {
             width: 100%;
             max-width: 600px;
@@ -140,7 +152,11 @@
             The best performance was achieved using the first method, so I ultimately chose it.
         </p>
 
-        <p><strong>UPDATE:</strong> Later, I noticed that when the car approached the line in curves, the parameter changes caused more oscillations. 
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/1cr4cVp8CvE" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <p><strong>🚩 UPDATE:</strong> Later, I noticed that when the car approached the line in curves, the parameter changes caused more oscillations. 
             I tried other techniques to detect curves and straights (such as using the contours of the calculated mask), 
             but none were robust enough to provide substantial improvements. 
             Therefore, I ultimately <strong>disabled this feature in the final code.</strong>
