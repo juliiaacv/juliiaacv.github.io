@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 2 | Entry 2</title>
+    <style>
+        body {
+            font-family: 'Verdana', sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #d2baee;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #450549;
+            text-align: center;
+        }
+        p {
+            font-size: 18px;
+            text-align: justify;
+        }
+        img {
+            width: 100%;
+            max-width: 600px;
+            display: block;
+            margin: 10px auto;
+            border-radius: 10px;
+        }
+        ul {
+            font-size: 18px;
+            text-align: justify;
+            padding-left: 20px;
+        }
+        .back {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #b82c89;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .back:hover {
+            color: #b82c89;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Entry 2:Point Selection & Correspondence Matching</h1>
+
+        <h2>🎯 Reproducible Interest Point Selection</h2>
+        <p>
+            Next, I proceed to select a fixed number of interest points from the edges of the left image, in a reproducible way. 
+            The goal is to run initial tests using isolated points and start building up the full solution.
+        </p>
+
+        <p>
+            To achieve this, I select <strong>N</strong> random points among the extracted edge points using a fixed random seed 
+            (<code>random.seed(42)</code>). This way, I can debug and iterate easily since the input points remain the same in each execution. 
+            The following image shows the 5 selected points (<strong>N = 5</strong>).
+        </p>
+
+        <img src="images\img3.png" alt="Selected reproducible points (N=5)">
+
+        <h2>🖼️ Matching with the Right Camera</h2>
+        <p>
+            In order to move on to triangulation, I first need to find the corresponding point in the right image that best matches 
+            the reference point in the left image.
+        </p>
+
+        <p>
+            To begin, I assume that the stereo cameras are horizontally aligned. This means that the corresponding point in the 
+            right image should lie on the same row as the one in the left image. This assumption greatly reduces the search space 
+            during the matching process.
+        </p>
+
+        <p>
+            The approach I used is:
+        </p>
+
+        <ul>
+            <li>Define a small comparison <strong>patch</strong> around the selected point in the left image.</li>
+            <li>Search within a horizontal band (same row ± margin) in the right image.</li>
+            <li>Compare the left patch with every possible position in the right-side band to find the best match.</li>
+        </ul>
+
+        <p>
+            Since <code>ShowImageMatching</code> wasn’t working properly, I created my own function to visualize the matched pairs 
+            for debugging and validation.
+        </p>
+
+        <img src="images\img4.png" alt="Matched points shown on stereo pair">
+
+        <h2>📌 Summary So Far</h2>
+        <p>
+            In <strong>Entry 1</strong>, I set up the stereo image capture pipeline and performed initial edge detection using Canny.  
+            In <strong>Entry 2</strong>, I implemented reproducible point selection and a basic patch-matching strategy to find 
+            correspondences between stereo images.
+        </p>
+
+        <p>
+            The following steps will involve:
+        </p>
+        <ul>
+            <li>Triangulating the matched points to obtain their 3D coordinates.</li>
+            <li>Improving the matching and feature extraction pipelines.</li>
+        </ul>
+
+        <p class="back"><a href="index.html">⬅ Back to Exercise 2</a></p>
+    </div>
+</body>
+</html>
