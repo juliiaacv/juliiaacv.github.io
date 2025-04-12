@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 2 | Entry 1</title>
+    <style>
+        body {
+            font-family: 'Verdana', sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #d2baee;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #450549;
+            text-align: center;
+        }
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        img {
+            width: 100%;
+            max-width: 600px;
+            display: block;
+            margin: 10px auto;
+            border-radius: 10px;
+        }
+        ul {
+            font-size: 18px;
+            text-align: justify;
+            padding-left: 20px;
+        }
+        .back {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #b82c89;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .back:hover {
+            color: #b82c89;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Entry 1: Initial Setup & Feature Detection</h1>
+
+        <h2>⚙️ Initial Setup</h2>
+        <p>
+            To get started with this exercise, I begin by checking the initial state of the system, which means capturing images from the stereo cameras 
+            (left and right), and visualizing them.
+        </p>
+
+        <p>
+            We can observe images of the scene, which appear noticeably dark (this is interesting to keep in mind for the feature extraction process). 
+            I also noticed that because the robot is placed far away, the objects in the image seem elevated. I'm not sure if this will affect 
+            the final 3D reconstruction.
+        </p>
+
+        <p>
+            Additionally, the output from the image capture functions is an image in OpenCV format (<code>numpy.ndarray</code>).
+        </p>
+
+        <img src="images\img1.png" alt="Stereo camera image preview">
+
+        <h2>🧠 Feature Detection (Canny Edge Detection)</h2>
+        <p>
+            Next, I’m implementing a first version to extract feature points that I will use later as a base to find correspondences and 
+            reconstruct the 3D space.
+        </p>
+
+        <p>
+            I chose to use a <strong>Canny edge detector</strong>, since edges are more abundant than other types of interest points and are 
+            useful for generating a high number of features.
+        </p>
+
+        <p>
+            For this, I first convert the images to grayscale. I also apply a Gaussian filter to smooth the image and reduce noise, which 
+            helps avoid false edge detections. Finally, I apply the Canny algorithm with thresholds 50 and 150.
+        </p>
+
+        <img src="images\img2.png" alt="Canny edge detection result">
+
+        <p>
+            Looking at these results, we can see that many edges are not being detected, but for now this is more than enough to move on 
+            to the core of the task. However, in the future, I plan to explore the following aspects:
+        </p>
+
+        <ul>
+            <li>Adjusting the Canny threshold values.</li>
+            <li>Improving image lighting through preprocessing, in order to reconstruct the scene with better color quality.</li>
+        </ul>
+
+        <p class="back"><a href="index.html">⬅ Back to Exercise 2</a></p>
+    </div>
+</body>
+</html>
