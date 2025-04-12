@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 2 | Entry 3</title>
+    <style>
+        body {
+            font-family: 'Verdana', sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #d2baee;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #450549;
+            text-align: center;
+        }
+        p {
+            font-size: 18px;
+            text-align: justify;
+        }
+        ul {
+            font-size: 18px;
+            text-align: justify;
+            padding-left: 20px;
+        }
+        img {
+            width: 100%;
+            max-width: 600px;
+            display: block;
+            margin: 10px auto;
+            border-radius: 10px;
+        }
+        .back {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #b82c89;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .back:hover {
+            color: #b82c89;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Entry 3: Triangulation & 3D Point Visualization</h1>
+
+        <h2>🔼 Triangulation & 3D Point Visualization</h2>
+        <p>
+            Everything is now ready to compute the 3D position of the previously matched points.
+        </p>
+
+        <p>
+            For this, I use the <code>HAL.backproject()</code> function to convert the 2D coordinates into backprojection rays from each camera. 
+            Then, I take the midpoint between the two rays to estimate the actual position of the point in 3D space.
+        </p>
+
+        <p>
+            Afterward, the resulting 3D point is transformed into the 3D viewer's coordinate system using <code>HAL.project3DScene()</code>. 
+            To assign each point its real color, I compute the average color of the corresponding pixels in both images.
+        </p>
+
+        <p>
+            This helps reduce minor camera differences and results in a more natural visualization.
+            I concatenate the 3D point with its color values <code>[r, g, b]</code> to form a 6-element list, and use 
+            <code>GUI.ShowNewPoints()</code> to display the colored point in the viewer.
+        </p>
+
+        <p>
+            During this step, I encountered an error when visualizing the points in the 3D viewer. Specifically, 
+            <code>GUI.ShowNewPoints()</code> threw a <code>ValueError</code> with the message 
+            <em>"the truth value of an array with more than one element is ambiguous"</em>.
+            This issue was caused by passing NumPy arrays directly instead of converting them to lists.
+            Once I forced both the 3D point coordinates and their color to be lists, the first triangulated points displayed successfully:
+        </p>
+
+        <img src="images/img5.png" alt="First displayed 3D points" style="width: 50%; max-width: 400px;">
+
+        <h2>🧠 Testing Triangulation with More Points</h2>
+        <p>
+            When testing the triangulation on a larger set of points, the 3D viewer began to show a partial reconstruction of the scene. 
+            However, two clear issues became immediately visible:
+        </p>
+
+        <ol>
+            <li>
+                The image appears inverted:
+                <img src="images/img6.png" alt="Scene inverted" style="width: 50%; max-width: 400px;">
+            </li>
+            <li>
+                No depth is present: The z value is always the same.
+                <img src="images/img7.png" alt="No depth in triangulated scene" style="width: 50%; max-width: 400px;">
+            </li>
+        </ol>
+
+        <h2>🚧 Correct 3D Point Triangulation</h2>
+        <p>
+            By printing the output from my triangulation function, I confirmed that something was going wrong. 
+            As shown in the previous image, the <code>z</code> coordinate was always 1. Something was clearly broken.
+        </p>
+
+        <p>
+            In the initial implementation, the 3D point was estimated by averaging the outputs from <code>HAL.backproject()</code> 
+            from both cameras. This approach ignored the actual position of the cameras and assumed both rays originated from the same point, 
+            which is incorrect.
+        </p>
+
+        <p>
+            Additionally, <code>HAL.backproject()</code> returns a 3D point that lies along a ray, but doesn’t define the entire ray path. 
+            Without knowing the ray’s origin (the camera position), proper triangulation isn't possible.
+        </p>
+
+        <p>
+            To solve this, I changed my strategy, making use of the available functions and applying stereo ray geometry.
+        </p>
+
+        <p>
+            First, I obtained the actual position of each camera using <code>HAL.getCameraPosition()</code>, which gives the ray's origin.
+            Then, I transformed each image point into optical coordinates using <code>HAL.graphicToOptical()</code>.
+        </p>
+
+        <p>
+            Next, I applied <code>HAL.backproject()</code> to the optical point to get a 3D point in the ray's direction.
+            I then computed the direction vector by subtracting the camera position from this point — 
+            thus defining the full ray (origin + direction).
+        </p>
+
+        <p>
+            With the two rays defined, I solved for their intersection by computing the closest points on each line and averaging them 
+            if they don’t intersect exactly. With this new method, the resulting points now show proper depth.
+        </p>
+
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+            <img src="images\img8.png" alt="Correctly triangulated 3D points - Side View" style="max-width: 48%; border-radius: 10px;">
+            <img src="images\img9.png" alt="Correctly triangulated 3D points - Frontal View 2" style="max-width: 48%; border-radius: 10px;">
+        </div>
+
+        <p class="back"><a href="index.html">⬅ Back to Exercise 2</a></p>
+    </div>
+</body>
+</html>
