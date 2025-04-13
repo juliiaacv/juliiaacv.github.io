@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 2 | Entry 5</title>
+    <style>
+        body {
+            font-family: 'Verdana', sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #d2baee;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #450549;
+            text-align: center;
+        }
+        p {
+            font-size: 18px;
+            text-align: justify;
+        }
+        .video-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        iframe {
+            width: 100%;
+            max-width: 600px;
+            height: 340px;
+            border-radius: 10px;
+        }
+        .back {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #b82c89;
+            text-decoration: none;
+        }
+        .back:hover {
+            color: #b82c89;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Entry 5: Final Thoughts and Demo</h1>
+
+        <h2>📌 Conclusion</h2>
+        <p>
+            Throughout this exercise, I developed a complete stereo vision pipeline capable of reconstructing a 3D scene from two camera images. 
+            Starting with the capture and visualization of the stereo images, I applied preprocessing techniques like gamma correction to improve visibility 
+            and enhance edge detection using the Canny algorithm.
+        </p>
+
+        <p>
+            Once the interest points were extracted, I implemented a reproducible selection method to work consistently with the same inputs. 
+            From there, I created a custom patch-matching function to establish correspondences between both images, which laid the foundation for triangulating points in 3D space.
+        </p>
+
+        <p>
+            After refining the triangulation logic and incorporating the true position of the cameras, I achieved a final visualization where the depth information 
+            is correctly represented, and each point is colored based on the images. The resulting 3D output clearly reflects the structure of the observed scene 
+            and confirms that the reconstruction process works effectively from start to finish.
+        </p>
+
+        <h2>🎥 Final Result</h2>
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/uHuf6EwWsqo" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <p class="back"><a href="index.html">⬅ Back to Exercise 2</a></p>
+    </div>
+</body>
+</html>
