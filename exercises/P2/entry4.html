@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 2 | Entry 4</title>
+    <style>
+        body {
+            font-family: 'Verdana', sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #d2baee;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #450549;
+            text-align: center;
+        }
+        p {
+            font-size: 18px;
+            text-align: justify;
+        }
+        ul {
+            font-size: 18px;
+            padding-left: 20px;
+            text-align: justify;
+        }
+        .image-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        .image-row img {
+            max-width: 100%;
+            width: 48%;
+            border-radius: 10px;
+        }
+        .image-row.three img {
+            width: 31%;
+        }
+        .back {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #b82c89;
+            text-decoration: none;
+        }
+        .back:hover {
+            color: #b82c89;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Entry 4: Visualization Enhancement and Edge Detection</h1>
+
+        <h2>🎨 Improved Visualization & Edge Detection</h2>
+        <p>
+            While visualizing the images captured by the cameras, I noticed (as mentioned before) that they are significantly dark. 
+            This directly affects the quality of edge detection, since many relevant details are lost when applying the Canny detector. 
+            To improve the edge detection, I introduced the following changes:
+        </p>
+
+        <ol>
+            <li><strong>Gamma Correction:</strong> During preprocessing, I apply a gamma transformation with a value of 1.5. 
+            This brightens darker areas without saturating the brighter ones.</li>
+            <li><strong>Canny Threshold Tuning:</strong> I experimented with several threshold combinations until finding the one 
+            that captures the most relevant details without excessive noise.</li>
+        </ol>
+
+        <p>
+            As a result, the detection of interest points has significantly improved. The images below illustrate this improvement: 
+            first comparing the original image (left) with the gamma-corrected one (right), followed by edge detection comparisons: 
+            original detection (left), after gamma correction (center), and with final threshold adjustment (right).
+        </p>
+
+        <div class="image-row">
+            <img src="images/img10.png" alt="Original image">
+            <img src="images/img11.png" alt="Gamma-corrected image">
+        </div>
+
+        <div class="image-row three">
+            <img src="images/img12.png" alt="Canny - Original">
+            <img src="images/img13.png" alt="Canny - After Gamma">
+            <img src="images/img14.png" alt="Canny - Final Threshold">
+        </div>
+
+        <h2>🔁 Change in Execution Loop Structure</h2>
+        <p>
+            I had been considering for some time that it would make more sense if the main <code>while</code> loop only contained 
+            the main function call, and that the interest points were processed entirely within that single iteration.
+        </p>
+
+        <p>
+            To implement this, I adjusted the function responsible for retrieving the interest points. I removed the limited random 
+            selection and instead returned all points that belong to the detected edges. This leads to a more complete and accurate 
+            reconstruction of the environment.
+        </p>
+
+        <img src="images/img15.png" alt="Result after loop restructure" style="max-width: 70%; display: block; margin: 20px auto; border-radius: 10px;">
+
+        <p class="back"><a href="index.html">⬅ Back to Exercise 2</a></p>
+    </div>
+</body>
+</html>
