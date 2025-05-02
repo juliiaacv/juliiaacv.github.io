@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 3 | Entry 1</title>
+    <style>
+        body {
+            font-family: 'Verdana', sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #d2baee;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #450549;
+            text-align: center;
+        }
+        p {
+            font-size: 18px;
+            text-align: justify;
+        }
+        img {
+            width: 100%;
+            max-width: 600px;
+            display: block;
+            margin: 15px auto;
+            border-radius: 10px;
+        }
+        .image-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        .image-row img {
+            width: 48%;
+            border-radius: 10px;
+        }
+        .video-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        iframe {
+            width: 100%;
+            max-width: 600px;
+            height: 340px;
+            border-radius: 10px;
+        }
+        .back {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #b82c89;
+            text-decoration: none;
+        }
+        .back:hover {
+            color: #b82c89;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧭 Entry 1: AprilTag Detection and Pose Estimation</h1>
+
+        <h2>🚀 Starting the Exercise</h2>
+        <p>
+            To begin this exercise, I simply displayed the camera capture from the robot to get an initial sense of the setup.
+            When execution starts, the map shows the robot's current position. The front of the robot (where the camera is pointing) is indicated by a small blue triangle, as seen below.
+        </p>
+
+        <p>
+            Additionally, the captured image is shown. In this case, two AprilTags are visible — one closer than the other:
+        </p>
+
+        <img src="images/image1.png" alt="Initial camera capture showing AprilTags">
+
+        <h2>🔍 AprilTag Detection</h2>
+        <p>
+            Next, following the exercise guide, I added a function to detect AprilTags in the image using the <code>pyapriltags</code> library, 
+            specifying the “tag36h11” family as indicated.
+        </p>
+
+        <p>
+            The detector returns a list of detected tags in the image, each with the following information:
+        </p>
+
+        <ul>
+            <li><strong>tag_family:</strong> The tag family ("tag36h11")</li>
+            <li><strong>tag_id:</strong> The unique ID of the tag within the family</li>
+            <li><strong>tag_size:</strong> Real-world size of the tag (None, unless specified)</li>
+            <li><strong>hamming:</strong> Number of differing bits (should be zero)</li>
+            <li><strong>decision_margin:</strong> Confidence value of the detection</li>
+            <li><strong>homography:</strong> 3×3 matrix from tag frame to image</li>
+            <li><strong>center:</strong> Center of the tag in pixel coordinates</li>
+            <li><strong>corners:</strong> List of four corners in pixel coordinates (top-left, top-right, bottom-right, bottom-left)</li>
+            <li><strong>pose_R:</strong> 3×3 rotation matrix</li>
+            <li><strong>pose_t:</strong> 3×1 translation vector (position relative to the camera)</li>
+            <li><strong>pose_err:</strong> Associated error in pose estimation</li>
+        </ul>
+
+        <p>
+            By drawing the lines between the corners and highlighting the tag center, the result is visualized as follows:
+        </p>
+
+        <img src="images/image2.png" alt="Detected AprilTags with corner and center lines drawn">
+
+        <h2>🧭 Tag Detection at Various Angles</h2>
+        <p>
+            The initial image is taken with the camera directly facing the tags, but I wanted to test how well the system performs under different conditions.
+        </p>
+
+        <p>
+            By navigating randomly through the area, I found that AprilTags are successfully detected even when they are not perfectly frontal. Below are two examples:
+        </p>
+
+        <div class="image-row">
+            <img src="images/image3.png" alt="AprilTag seen at angle 1">
+            <img src="images/image4.png" alt="AprilTag seen at angle 2">
+        </div>
+
+        <p>
+            In the next image, two tags appear: one far away that is detected successfully, and one on the side, which is barely visible and not detected:
+        </p>
+
+        <img src="images/image5.png" alt="Side tag not detected properly due to angle">
+
+        <p>
+            Additionally, when a tag is partially occluded (about halfway out of view), detection fails. This can be seen in the video below, 
+            where the tag is detected until it leaves the right edge of the frame:
+        </p>
+
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/EQusKhfRO-c" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <h2>📍 Getting the Tag's Coordinates</h2>
+        <p>
+            Before estimating the robot’s pose relative to the tag, I visualized the available 3D coordinates of the tag's center along with its 2D image position.
+            Using the provided YAML data and the detected tag IDs, I retrieved their 3D coordinates in the simulated world.
+        </p>
+
+        <p>
+            I created a helper function to visualize both 2D and 3D coordinates for debugging:
+        </p>
+
+        <img src="images\image6.png" alt="3D world and 2D image coordinates of the tag center">
+
+        <p>
+            The 3D coordinates refer to the center of the tag in the simulated environment, while the 2D coordinates are from the image.
+            These values will be useful later when transforming the robot’s pose to world coordinates using <code>solvePnP</code>.
+        </p>
+
+        <h2>📐 SolvePnP</h2>
+        <p>
+            Moving forward, the next step is to estimate the robot’s pose relative to the tag’s coordinate system using <code>solvePnP</code>.
+        </p>
+
+        <p>
+            Since the reference frame is centered on the tag, its center is defined as (0, 0), and the corners are calculated based on the tag size provided 
+            (0.3 × 0.3 m total, 0.24 × 0.24 m black region).
+        </p>
+
+        <p>
+            Using the detected corner positions, the camera matrix (as described in the instructions), and the known tag size, 
+            I applied <code>solvePnP</code>, which returns:
+        </p>
+
+        <ul>
+            <li><strong>tvec:</strong> Camera position relative to the tag</li>
+            <li><strong>rvec:</strong> Rotation vector (Rodrigues format) relative to the tag</li>
+        </ul>
+
+        <p>
+            In the following video, you can see the pose estimation functioning properly whenever a tag is detected. 
+            There are small variations when the robot moves, but overall the results remain consistent across frames:
+        </p>
+
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/D05lbqzSD0Y" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <p class="back"><a href="../index.html">⬅ Back to Exercise 3</a></p>
+    </div>
+</body>
+</html>
