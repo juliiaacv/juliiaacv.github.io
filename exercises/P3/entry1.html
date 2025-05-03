@@ -97,17 +97,26 @@
         </p>
 
         <ul>
-            <li><strong>tag_family:</strong> The tag family ("tag36h11")</li>
-            <li><strong>tag_id:</strong> The unique ID of the tag within the family</li>
-            <li><strong>tag_size:</strong> Real-world size of the tag (None, unless specified)</li>
-            <li><strong>hamming:</strong> Number of differing bits (should be zero)</li>
-            <li><strong>decision_margin:</strong> Confidence value of the detection</li>
-            <li><strong>homography:</strong> 3×3 matrix from tag frame to image</li>
-            <li><strong>center:</strong> Center of the tag in pixel coordinates</li>
-            <li><strong>corners:</strong> List of four corners in pixel coordinates (top-left, top-right, bottom-right, bottom-left)</li>
-            <li><strong>pose_R:</strong> 3×3 rotation matrix</li>
-            <li><strong>pose_t:</strong> 3×1 translation vector (position relative to the camera)</li>
-            <li><strong>pose_err:</strong> Associated error in pose estimation</li>
+            <li><strong>tag_family:</strong> The tag family. In this case, "tag36h11".</li>
+            <li><strong>tag_id:</strong> An integer representing the unique identifier of the tag within its family.</li>
+            <li><strong>tag_size:</strong> The real-world size of the AprilTag. This is returned as <code>None</code> because no size was specified in the detector.
+                According to the guide: <em>"The AprilTags are set at 0.8 meters in height and have a size of 0.3 x 0.3 meters (the black part is 0.24 x 0.24 meters)."</em>
+            </li>
+            <li><strong>hamming:</strong> The number of differing bits between the detected tag and the expected code. It is zero.</li>
+            <li><strong>decision_margin:</strong> A value representing the confidence of the detection.</li>
+            <li><strong>homography:</strong> A 3x3 matrix representing the projective transformation from the tag’s coordinate system to the image.</li>
+            <li><strong>center:</strong> A tuple of two values (x, y) representing the center of the tag in pixel coordinates within the image.</li>
+            <li><strong>corners:</strong> A list of four (x, y) points representing the corners of the detected tag, in the following order:
+                <ul>
+                    <li>Top-left corner</li>
+                    <li>Top-right corner</li>
+                    <li>Bottom-right corner</li>
+                    <li>Bottom-left corner</li>
+                </ul>
+            </li>
+            <li><strong>pose_R:</strong> A 3x3 rotation matrix representing the orientation of the tag in 3D space.</li>
+            <li><strong>pose_t:</strong> A 3x1 translation vector representing the position of the tag relative to the camera.</li>
+            <li><strong>pose_err:</strong> The error associated with the pose estimation.</li>
         </ul>
 
         <p>
@@ -116,13 +125,14 @@
 
         <img src="images/image2.png" alt="Detected AprilTags with corner and center lines drawn">
 
-        <h2>🧭 Tag Detection at Various Angles</h2>
+        <h2>🔄 Tag Detection at Various Angles</h2>
         <p>
             The initial image is taken with the camera directly facing the tags, but I wanted to test how well the system performs under different conditions.
         </p>
 
         <p>
-            By navigating randomly through the area, I found that AprilTags are successfully detected even when they are not perfectly frontal. Below are two examples:
+            After taking a short random walk around the environment, I observed that even when the AprilTag doesn’t appear as a perfect square,
+            it is still correctly detected. Below are some images that illustrate this:
         </p>
 
         <div class="image-row">
@@ -131,14 +141,15 @@
         </div>
 
         <p>
-            In the next image, two tags appear: one far away that is detected successfully, and one on the side, which is barely visible and not detected:
+            In the next image, two tags appear: one far away, which is successfully detected, and another on the left side,
+which appears nearly as a thin line due to its extreme angle — and, as expected, is not detected correctly:
         </p>
 
         <img src="images/image5.png" alt="Side tag not detected properly due to angle">
 
         <p>
-            Additionally, when a tag is partially occluded (about halfway out of view), detection fails. This can be seen in the video below, 
-            where the tag is detected until it leaves the right edge of the frame:
+            Additionally, when the AprilTag is partially occluded (roughly when half of it is out of view), detection fails.
+            This can be clearly seen in the video below: the tag is detected until it exits the right side of the frame.
         </p>
 
         <div class="video-container">
@@ -164,17 +175,22 @@
 
         <h2>📐 SolvePnP</h2>
         <p>
-            Moving forward, the next step is to estimate the robot’s pose relative to the tag’s coordinate system using <code>solvePnP</code>.
+            Leaving the previous section aside, the next logical step after detecting the AprilTag is to estimate the robot’s pose with respect to the tag’s reference frame.
+        </p>
+        
+        <p>
+            That is precisely what I address here. As mentioned, the pose estimation is performed relative to the AprilTag’s coordinate system, 
+            where the center is considered to be at (0, 0), and the corners are calculated based on this origin and the tag’s size 
+            (as provided in the exercise instructions, 0.3 × 0.3 m total, 0.24 × 0.24 m black region).
         </p>
 
         <p>
-            Since the reference frame is centered on the tag, its center is defined as (0, 0), and the corners are calculated based on the tag size provided 
-            (0.3 × 0.3 m total, 0.24 × 0.24 m black region).
+            Additionally, the corner coordinates detected by the AprilTag detector are needed, along with the camera intrinsic matrix, 
+            which is obtained as described in the guide.
         </p>
 
         <p>
-            Using the detected corner positions, the camera matrix (as described in the instructions), and the known tag size, 
-            I applied <code>solvePnP</code>, which returns:
+            With all of this information, I can now apply the <code>solvePnP</code> function, which returns:
         </p>
 
         <ul>
@@ -183,8 +199,8 @@
         </ul>
 
         <p>
-            In the following video, you can see the pose estimation functioning properly whenever a tag is detected. 
-            There are small variations when the robot moves, but overall the results remain consistent across frames:
+            In the video I show below you can see that the operation is performed properly whenever a tag is detected, having some variations with respect to the same tag when the robot changes position, but remaining very similar between iterations.
+            On the other hand, you can see the captured image, in this case showing two apriltags, one closer than the other:
         </p>
 
         <div class="video-container">
