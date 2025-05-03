@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Exercise 3 | Entry 2</title>
+  <style>
+    body {
+      font-family: 'Verdana', sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background-color: #d2baee;
+      line-height: 1.6;
+    }
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2 {
+      color: #450549;
+      text-align: center;
+    }
+    p {
+      font-size: 18px;
+      text-align: justify;
+    }
+    ol {
+      font-size: 18px;
+      padding-left: 20px;
+    }
+    li {
+        text-align: justify;
+    }
+    .back {
+      display: block;
+      margin-top: 20px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+      color: #b82c89;
+      text-decoration: none;
+    }
+    .back:hover {
+      color: #b82c89;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Entry 2: Estimating the Robot's Global Position</h1>
+
+    <h2>🌍 Transforming to World Coordinates</h2>
+    <p>
+      With the robot's pose relative to the tag now estimated, I can proceed to convert it into global coordinates by combining the visually-obtained information 
+      from the AprilTags with known data about the scene.
+    </p>
+
+    <p>
+      Starting from the output of the <code>solvePnP</code> function — as detailed in the previous entry — I obtain the robot’s position (<code>tvec</code>) 
+      and orientation (<code>rvec</code>) relative to a tag detected in the image.
+    </p>
+
+    <p>
+      After converting this pose into a 4×4 homogeneous transformation matrix (combining rotation and translation), 
+      I use the known position and orientation of the AprilTag in the world, read from the <code>apriltags_poses.yaml</code> file. 
+      From this, I build another 4×4 matrix representing the transformation from the tag’s frame to the world frame.
+    </p>
+
+    <p>
+      With both matrices constructed — robot to tag, and tag to world — I multiply them to obtain the transformation from the robot to the global coordinate system. 
+      From this final matrix, I extract the robot’s translation (<code>x, y</code>) and orientation (<code>yaw</code>), 
+      which is the final target of the estimation.
+    </p>
+
+    <p>
+      This estimated pose is displayed on the simulator map using <code>GUI.showEstimatedPose</code>, allowing for visual comparison 
+      between the estimated pose (in red) and the real one (in green).
+    </p>
+
+    <h2>👁️‍🗨️ Observations</h2>
+    <p>
+        After running the code, I observed the following key issues:
+    </p>
+    
+    <ol>
+      <li>
+        The robot’s initial estimated position does not match its real location in the simulator. 
+        There is a clear error from the beginning in the visual localization.
+      </li>
+      <li>
+        The red trace representing the estimated trajectory shows unnatural behavior: sharp spikes and abrupt changes in direction. 
+        This suggests instability or lack of continuity in the estimation process.
+      </li>
+      <li>
+        The robot keeps moving even when no AprilTag is visible in the image. In such cases, <code>solvePnP</code> is not executed, 
+        and no update to the estimated pose occurs. As a result, the red line only reflects isolated estimations when a tag is detected, 
+        while intermediate motion based purely on odometry is ignored.
+      </li>
+    </ol>
+
+    <p>The video below illustrates all of the above:</p>
+    <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/Q4ljTkvVDdo" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <p class="back"><a href="index.html">⬅ Back to Exercise 3</a></p>
+  </div>
+</body>
+</html>
