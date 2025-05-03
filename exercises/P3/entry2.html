@@ -34,6 +34,18 @@
     li {
         text-align: justify;
     }
+    .video-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+    }
+    
+    iframe {
+    width: 100%;
+    max-width: 600px;
+    height: 340px;
+    border-radius: 10px;
+    }
     .back {
       display: block;
       margin-top: 20px;
@@ -101,7 +113,10 @@
       </li>
     </ol>
 
-    <p>The video below illustrates all of the above:</p>
+    <p>
+        The video below illustrates all of the above:
+    </p>
+    
     <div class="video-container">
         <iframe src="https://www.youtube.com/embed/Q4ljTkvVDdo" frameborder="0" allowfullscreen></iframe>
     </div>
