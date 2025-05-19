@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Exercise 3 | Entry 4</title>
+  <style>
+    body {
+      font-family: 'Verdana', sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background-color: #d2baee;
+      line-height: 1.6;
+    }
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2 {
+      color: #450549;
+      text-align: center;
+    }
+    p {
+      font-size: 18px;
+      text-align: justify;
+    }
+    ul, ol {
+      font-size: 18px;
+      padding-left: 20px;
+    }
+    li {
+      text-align: justify;
+    }
+    .video-container {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    ol li {
+      margin-bottom: 15px;
+    }
+    iframe {
+      width: 100%;
+      max-width: 600px;
+      height: 340px;
+      border-radius: 10px;
+    }
+    .back {
+      display: block;
+      margin-top: 20px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+      color: #b82c89;
+      text-decoration: none;
+    }
+    .back:hover {
+      color: #b82c89;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Entry 4: Robot in Motion and Final Solution</h1>
+
+    <h2>🤖 Robot Trajectory and Tag-Based Localization</h2>
+    <p>
+      Now that we have a reliable foundation for computing the robot’s position, we can set the robot in motion and observe how it self-localizes 
+      using detected AprilTags. However, there are many moments when no tag is visible in the image, so odometry must be used in those situations.
+    </p>
+
+    <p>
+      To control the robot's movement, I created an alternating loop of linear motion and rotation. First, the robot moves forward for a specified time, 
+      followed by a rotational phase for another time interval. This pattern results in a circular trajectory.
+    </p>
+
+    <p>
+      Additionally, to avoid tracing a perfect circle, I implemented logic to invert the rotation direction every few cycles. 
+      It’s not the most advanced motion pattern, but it is sufficient to demonstrate how the localization system functions.
+    </p>
+
+    <p>
+      The following video fragment shows the results:
+    </p>
+
+    <div class="video-container">
+      <iframe src="https://www.youtube.com/embed/S0C1FkI-3Hc" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <h2>✅ Final Version of the AprilTag-Based Visual Localization System</h2>
+    <p>
+      The final implementation accurately and stably estimates the robot’s position on the map using AprilTags, relying on odometry only when no tags are detected. 
+      The operational workflow is as follows:
+    </p>
+
+    <ol>
+      <li>
+        <strong>Autonomous Robot Movement:</strong>  
+        The robot moves in cycles alternating between forward movement and in-place rotations. 
+        After completing a full loop detecting four different tags and seeing the first tag again, it inverts its rotation direction 
+        to avoid continuous circular paths.
+      </li>
+      <li>
+        <strong>AprilTag Detection:</strong>  
+        Using the <code>pyapriltags</code> library, the system detects tags in the captured image and extracts their corners and center, 
+        overlaying them on the image for visualization.
+      </li>
+      <li>
+        <strong>Pose Estimation via solvePnP:</strong>  
+        With the detected corners and the known 3D model of the AprilTag, <code>cv2.solvePnP</code> is used to estimate the position and orientation 
+        of the robot relative to the tag’s coordinate system. This output includes rotation (as a Rodrigues vector) and translation in the camera space.
+      </li>
+      <li>
+        <strong>Transformation to World Coordinates:</strong>  
+        The relative pose estimated in the previous step is transformed into global coordinates by chaining a series of homogeneous transformations:
+        <ul>
+          <li>From physical tag to optical tag</li>
+          <li>From optical tag to optical camera (from solvePnP)</li>
+          <li>From optical camera to real camera</li>
+          <li>From real camera to robot center</li>
+          <li>From physical tag to world (from <code>apriltags_poses.yaml</code>)</li>
+        </ul>
+        This process allows the robot to be positioned precisely on the global map.
+      </li>
+      <li>
+        <strong>Result Visualization:</strong>  
+        The estimated pose (whether from vision or odometry) is shown on the simulator map using <code>GUI.showEstimatedPose</code>, 
+        allowing real-time visualization of the robot's estimated path.
+      </li>
+      <li>
+        <strong>Fallback to Odometry:</strong>  
+        When no tag is detected in the image, the system automatically switches to odometry to keep estimating the robot’s movement, 
+        preventing gaps or interruptions in the trajectory trace.
+      </li>
+    </ol>
+
+    <p>
+      This design successfully combines the accuracy of computer vision with the stability of odometry, enabling robust robot localization 
+      even when tags are temporarily occluded.
+    </p>
+
+    <p class="back"><a href="index.html">⬅ Back to Exercise 3</a></p>
+  </div>
+</body>
+</html>
